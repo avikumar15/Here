@@ -78,37 +78,10 @@ public class MainActivity extends AppCompatActivity {
         localBusinessList = new ArrayList<>();
         urls = new ArrayList<>();
 
-        messageListAdapter = new MessageListAdapter(this, messageList, localBusinessList);
+        messageListAdapter = new MessageListAdapter(this, messageList);
         messageRecycler.setLayoutManager(new LinearLayoutManager(this));
         messageRecycler.setAdapter(messageListAdapter);
 
-        findLatestLatitudeLongitude();
-
-    }
-
-    private void findLatestLatitudeLongitude() {
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        LocationListener mlocListener = new MyLocationListener(this, locationManager);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null) {
-                latestLongitude = location.getLongitude();
-                latestLatitude = location.getLatitude();
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, mlocListener);
-            }
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            findLatestLatitudeLongitude();
-        } else {
-            Toast.makeText(this, "Location permission required. Sorry", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void setListenerOnFab() {
@@ -132,13 +105,23 @@ public class MainActivity extends AppCompatActivity {
         addMessage(message, self, 1);
 
         final RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "https://d63fe6c43c57.ngrok.io/user_sentences";
+        String url = "https://467c93a61718.ngrok.io/chatbot/"+message;
 
-        final StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        Log.i("URL", url);
+
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d("onResponse", response);
-                getResponse();
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    String result = jsonObject.getString("reply");
+                    Log.i("result", result);
+                    addMessage(result, bot, 2);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -166,86 +149,9 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private void getResponse() {
-        final RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "https://d63fe6c43c57.ngrok.io/response";
-
-        addMessage("Okay, searching...", bot, 2);
-        urls.add("");
-        urls.add("");
-
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        String searchTerm = "";
-
-                        try {
-                            JSONObject responseJson = new JSONArray(response).getJSONObject(0);
-                            searchTerm = responseJson.getJSONObject("queryContext").getString("originalQuery");
-                            JSONArray placesArray = responseJson.getJSONObject("places").getJSONArray("value");
-                            List<LocalBusiness> businessList = getBusinessList(placesArray);
-
-                            String heresAList = "Here's a list of places where you can eat " + searchTerm;
-                            addMessage(heresAList, bot, 2);
-
-                            for (int i = 0; i < Math.min(5, businessList.size()); i++) {
-                                LocalBusiness business = businessList.get(i);
-                                StringBuilder businessDetailsMessageBody = new StringBuilder();
-                                businessDetailsMessageBody.append(business.getName()).append("\n");
-                                businessDetailsMessageBody.append(business.getContactNumber()).append("\n");
-                                businessDetailsMessageBody.append(business.getAddress()).append("\n");
-                                businessDetailsMessageBody.append(business.getUrl());
-                                urls.add(business.getUrl());
-
-                                addMessage(businessDetailsMessageBody.toString(), bot, 2);
-                            }
-
-                        } catch (JSONException e) {
-                            Log.e("Here", "JSON error: " + e.getMessage());
-                            Toast.makeText(MainActivity.this, "An error occurred while parsing JSON.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("error", error.toString());
-                Toast.makeText(MainActivity.this, "An error occurred while getting a response :(", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(10000, 2, 1.0f));
-
-        // 1 sec lag
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                queue.add(stringRequest);
-            }
-        }, 2000);
-    }
-
-    private List<LocalBusiness> getBusinessList(JSONArray places) throws JSONException {
-        List<LocalBusiness> businessList = new ArrayList<>();
-
-        for (int i = 0; i < places.length(); i++) {
-            JSONObject place = places.getJSONObject(i);
-            String type = place.getString("_type");
-            String name = place.getString("name");
-            String url = place.getString("url");
-            String address = place.getJSONObject("address").getString("text");
-            String contactNumber = place.getString("telephone");
-
-            businessList.add(new LocalBusiness(type, address, name, contactNumber, url));
-        }
-
-        return businessList;
-    }
-
     private void addMessage(String message, User sender, int type) {
         messageList.add(new Message(message, sender, Calendar.getInstance().getTimeInMillis(), type));
-        messageListAdapter.setList(messageList, localBusinessList, urls);
+        messageListAdapter.setList(messageList);
         messageListAdapter.notifyDataSetChanged();
         messageRecycler.smoothScrollToPosition(messageList.size() - 1);
     }

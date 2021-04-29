@@ -15,12 +15,10 @@ import java.util.List;
 
 public class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.ResponseHolder> {
 
-    private List<LocalBusiness> localBusinessList;
     private Context mContext;
 
-    public ResponseAdapter(Context mContext, List<LocalBusiness> localBusinessList) {
+    public ResponseAdapter(Context mContext) {
         this.mContext = mContext;
-        this.localBusinessList = localBusinessList;
     }
 
     @NonNull

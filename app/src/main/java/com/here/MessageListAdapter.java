@@ -27,19 +27,14 @@ class MessageListAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
     private List<Message> messageList;
-    private List<LocalBusiness> businessList;
-    private List<String> urls;
 
-    public MessageListAdapter(Context mContext, List<Message> messageList, List<LocalBusiness> businessList) {
+    public MessageListAdapter(Context mContext, List<Message> messageList) {
         this.mContext = mContext;
         this.messageList = messageList;
-        this.businessList = businessList;
     }
 
-    public void setList(List<Message> messageList, List<LocalBusiness> localBusinessList, List<String> urls) {
+    public void setList(List<Message> messageList) {
         this.messageList = messageList;
-        this.businessList = localBusinessList;
-        this.urls = urls;
     }
 
     @NonNull
@@ -76,7 +71,7 @@ class MessageListAdapter extends RecyclerView.Adapter {
                 ((SentMessageHolder) holder).bind(message);
                 break;
             case VIEW_TYPE_MESSAGE_RECEIVED:
-                ((ReceivedMessageHolder) holder).bind(message, urls.get(position));
+                ((ReceivedMessageHolder) holder).bind(message);
                 break;
         }
     }
@@ -101,37 +96,16 @@ class MessageListAdapter extends RecyclerView.Adapter {
             nameText = itemView.findViewById(R.id.recevied_message_sender_name);
             profilePicture = itemView.findViewById(R.id.received_message_sender_profile_picture);
             richLinkView = itemView.findViewById(R.id.richLink);
-//            businessRecyclerView = itemView.findViewById(R.id.rv_business);
 
-            responseAdapter = new ResponseAdapter(mContext, businessList);
+            responseAdapter = new ResponseAdapter(mContext);
 
         }
 
-        void bind(Message message, final String url) {
-
-//            businessRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-//            businessRecyclerView.setAdapter(responseAdapter);
+        void bind(Message message) {
 
             messageBody.setText(message.getMessage());
             timeText.setText(DateUtils.formatDateTime(mContext, message.getCreatedAt(), DateUtils.FORMAT_SHOW_TIME));
             nameText.setText(message.getSender().getName());
-            System.out.println("url is "+url);
-            if(url.startsWith("https")) {
-                richLinkView.setLink(url, new ViewListener() {
-                    @Override
-                    public void onSuccess(boolean status) {
-
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-
-                    }
-                });
-            }
-//            if(!url.equals("")) {
-//
-//            }
 
         }
     }

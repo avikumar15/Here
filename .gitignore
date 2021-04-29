@@ -3,13 +3,13 @@
 *.aar
 *.ap_
 *.aab
-
+.idea/
 # Files for the ART/Dalvik VM
 *.dex
 
 # Java class files
 *.class
-
+.idea/codeStyles/Project.xml
 # Generated files
 bin/
 gen/
