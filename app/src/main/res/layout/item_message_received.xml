@@ -21,7 +21,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="3dp"
-        android:text="HereBot"
+        android:text="HelpMeBot"
         android:textSize="10sp"
         app:layout_constraintLeft_toRightOf="@id/received_message_sender_profile_picture"
         app:layout_constraintTop_toTopOf="parent" />
@@ -48,28 +48,24 @@
         app:layout_constraintBottom_toBottomOf="@id/received_message_body"
         app:layout_constraintLeft_toRightOf="@id/received_message_body" />
 
-    <io.github.ponnamkarthik.richlinkpreview.RichLinkView
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintGuide_percent="0.75"
+        android:orientation="vertical"
+        android:id="@+id/cl"
+        />
+
+    <ImageView
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
-        android:id="@+id/richLink"
         app:layout_constraintTop_toBottomOf="@id/received_message_timestamp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/received_message_body"
+        app:layout_constraintEnd_toEndOf="@id/cl"
+        android:layout_marginTop="20dp"
+        android:id="@+id/iv_image"
         >
-
-    </io.github.ponnamkarthik.richlinkpreview.RichLinkView>
-
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:id="@+id/rv_business"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/received_message_timestamp"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        >-->
-
-<!--    </androidx.recyclerview.widget.RecyclerView>-->
+    </ImageView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

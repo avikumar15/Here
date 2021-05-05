@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.here.models.LocalBusiness;
+import com.squareup.picasso.Picasso;
 
 import io.github.ponnamkarthik.richlinkpreview.RichLinkView;
 import io.github.ponnamkarthik.richlinkpreview.ViewListener;
@@ -86,7 +88,7 @@ class MessageListAdapter extends RecyclerView.Adapter {
         TextView messageBody, timeText, nameText;
         ImageView profilePicture;
         RecyclerView businessRecyclerView;
-        RichLinkView richLinkView;
+        ImageView imageView;
         ResponseAdapter responseAdapter;
 
         ReceivedMessageHolder(View itemView) {
@@ -95,7 +97,7 @@ class MessageListAdapter extends RecyclerView.Adapter {
             timeText = itemView.findViewById(R.id.received_message_timestamp);
             nameText = itemView.findViewById(R.id.recevied_message_sender_name);
             profilePicture = itemView.findViewById(R.id.received_message_sender_profile_picture);
-            richLinkView = itemView.findViewById(R.id.richLink);
+            imageView = itemView.findViewById(R.id.iv_image);
 
             responseAdapter = new ResponseAdapter(mContext);
 
@@ -105,6 +107,32 @@ class MessageListAdapter extends RecyclerView.Adapter {
 
             messageBody.setText(message.getMessage());
             timeText.setText(DateUtils.formatDateTime(mContext, message.getCreatedAt(), DateUtils.FORMAT_SHOW_TIME));
+
+            String[] test = message.getMessage().split(":");
+            if(test.length>=3) {
+                if(test[1].equals("http") || test[1].equals("https")) {
+                    StringBuilder fin = new StringBuilder("https:");
+                    for(int i=2; i<test.length; i++) {
+                        fin.append(test[i]);
+                    }
+                    if(test[0].equals("m")) {
+                        messageBody.setText("Here is a meme for you!");
+                    } else if(test[0].equals("i")) {
+                        messageBody.setText("Here is something inspirational for you!");
+                    } else {
+                        messageBody.setText("Here is something which might help you!");
+                    }
+
+                    Picasso.get()
+                            .load(fin.toString())
+                            .into(imageView);
+
+                } else {
+                    imageView.setVisibility(View.GONE);
+                }
+            } else {
+                imageView.setVisibility(View.GONE);
+            }
             nameText.setText(message.getSender().getName());
 
         }

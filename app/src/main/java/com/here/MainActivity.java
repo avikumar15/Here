@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         addMessage(message, self, 1);
 
         final RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "https://467c93a61718.ngrok.io/chatbot/"+message;
+        String url = "https://14377474d02e.ngrok.io/chatbot/"+message;
 
         Log.i("URL", url);
 
