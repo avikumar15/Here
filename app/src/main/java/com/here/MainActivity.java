@@ -58,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
     private List<Message> messageList;
     private List<LocalBusiness> localBusinessList;
     private User self = new User("you");
-    private User bot = new User("HereBot");
+    private User bot = new User("HelpMeBot");
     List<String> urls;
+    String base = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +93,14 @@ public class MainActivity extends AppCompatActivity {
                 if (typedMessage != null) {
                     String userMessage = typedMessage.toString().trim();
                     if (!userMessage.trim().isEmpty()) {
-                        sendMessage(userMessage);
+                        if(userMessage.split(":")[0].equals("https")) {
+                            base = userMessage;
+                            addMessage(userMessage, self, 1);
+                            addMessage("Bot connected!", bot, 2);
+                        } else if(base.equals("")) {
+                            Toast.makeText(MainActivity.this, "Abey Sale", Toast.LENGTH_SHORT).show();
+                        } else
+                            sendMessage(userMessage);
                     }
                 }
                 messageInputEditText.setText("");
@@ -105,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         addMessage(message, self, 1);
 
         final RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "https://14377474d02e.ngrok.io/chatbot/"+message;
+        String url = base + "chatbot/"+message;
 
         Log.i("URL", url);
 
